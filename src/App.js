@@ -1,53 +1,34 @@
 import React, {useEffect, useState} from 'react';
-import './App.css';
+import { amountsCAD, omitConvertions, sumAmts, formatter } from './scripts'
+
+const transactionsURL = 'https://shakepay.github.io/programming-exercise/web/transaction_history.json'
+const btcURL = 'https://shakepay.github.io/programming-exercise/web/rates_CAD_BTC.json'
+const ethURL = 'https://shakepay.github.io/programming-exercise/web/rates_CAD_ETH.json'
 
 function App() {
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [rates, setRates] = useState({});
 
-  const url = 'https://shakepay.github.io/programming-exercise/web/transaction_history.json'
-
-  const rates = {
-    BTC: 20872.26,
-    ETH: 602.91,
-    CAD: 1
-  }
-
-  const onlyBalances = (logs) => {
-    const inOut = ['credit', 'debit']
-    return logs.filter(log => inOut.includes(log.direction))
-  }
-
-  const amtsCAD = (amts) => {
-    return amts.map(amts => {
-      const x = amts.direction === 'debit' ? -1 : 1
-      return amts.amount * rates[amts.currency] * x
-    })
-  }
-
-  const sumAmts = (amts) => {
-    return amts.reduce((a,b) => a+b, 0);
-  }
-
-  const evaluateWorth = (data) => {
-    const balances = onlyBalances(data)
-    const amounts = amtsCAD(balances)
+  const evalWorth = (data) => {
+    const balances = omitConvertions(data)
+    const amounts = amountsCAD(balances, rates)
     const total = sumAmts(amounts)
-    return amounts[0] + total
+    return formatter.format(total)
   }
 
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'CAD',
-  });
+  useEffect(() => {
+    const callAPI = (url) => fetch(url).then(res => res.json())
+    const loadTransactions = () => callAPI(transactionsURL)
+      .then(data => setAllTransactions(data))
 
-  const [netWorth, setNetWorth] = useState();
+    Promise.all([ callAPI(btcURL), callAPI(ethURL) ])
+      .then(res => setRates({...rates, BTC: res[0], ETH: res[1]}))
+      .catch(err => console.log('whoops: ', err))
+      .finally(loadTransactions())
+  }, [rates])
 
-  useEffect(()=>{
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        setNetWorth(evaluateWorth(data))
-      })
-  },[])
+  if(!allTransactions || !rates.ETH || !rates.BTC)
+    return "Loading..."
 
   return (
     <div className="App">
@@ -55,7 +36,7 @@ function App() {
       Transaction Tallier:
       </h1>
       <div>
-      Your total worth is {formatter.format(netWorth)}!
+      Your total worth is {evalWorth(allTransactions)}!
       </div>
     </div>
   );
