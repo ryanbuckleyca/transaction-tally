@@ -34,33 +34,24 @@ function App() {
 
     const addBal = (curr, amt, dir) => (prevBalances[curr] || 0) + amt * dir
 
-    const getBalance = (currency, direction) => {
-      if(i===0) { return { [currency]: amount } }
+    const getBalance = (curr, dir) => {
       const x = { 'debit': -1, 'credit': 1}
-      if(!direction) {
-        return {
-          ...prevBalances,
-          [from.currency]: addBal(from.currency, from.amount, -1),
-          [to.currency]: addBal(to.currency, to.amount, 1)
-        }
-      }
+      if (i===0) return { [curr]: amount }
+      if(dir) return {...prevBalances, [curr]: addBal(curr, amount, x[dir]) }
       return {
         ...prevBalances,
-        [currency]: addBal(currency, amount, x[direction])
+        [from.currency]: addBal(from.currency, from.amount, -1),
+        [to.currency]: addBal(to.currency, to.amount, 1)
       }
     }
 
     const balances = getBalance(currency, direction)
-    const date = createdAt
-    const dayRates = ratesAtTime(date, rates)
+    const dayRates = ratesAtTime(createdAt, rates)
     const amountCAD = convertToCAD(amount, direction, currency, dayRates)
     const worthCAD = balanceCAD(dayRates, balances)
 
     balancedLogs.push({ ...logs[i], amountCAD, dayRates, balances, worthCAD})
   }
-
-  console.log(balancedLogs)
-
 
   const total = balancedLogs[balancedLogs.length - 1].worthCAD
 

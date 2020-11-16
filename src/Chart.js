@@ -7,7 +7,7 @@ class Chart extends Component {
   render() {
 
     const data = this.props.logs.map((tran, i) => {
-      return ({ x: i, y: tran.total })
+      return ({ x: i, y: tran.worthCAD })
     })
 
     return (
