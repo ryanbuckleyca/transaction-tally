@@ -3,15 +3,14 @@ import ListLogs from './ListLogs'
 import Chart from './Chart'
 import { ratesAtTime, printCAD, balanceCAD, convertToCAD } from './scripts'
 
-const transactionsURL = 'https://shakepay.github.io/programming-exercise/web/transaction_history.json'
+const logsURL = 'https://shakepay.github.io/programming-exercise/web/transaction_history.json'
 const btcURL = 'https://shakepay.github.io/programming-exercise/web/rates_CAD_BTC.json'
 const ethURL = 'https://shakepay.github.io/programming-exercise/web/rates_CAD_ETH.json'
 
 function App() {
   const [data, setData] = useState();
-  const [rates, setRates] = useState();
 
-  const processLogs = (logs) => {
+  const processLogs = (logs, rates) => {
     console.log('will process logs: ', logs)
     const balancedLogs = []
 
@@ -45,14 +44,17 @@ function App() {
   useEffect(() => {
     const callAPI = (url) => fetch(url).then(res => res.json())
 
-    Promise.all([ callAPI(btcURL), callAPI(ethURL) ])
-      .then(res => setRates({BTC: res[0], ETH: res[1]}))
+    Promise
+      .all([ callAPI(btcURL), callAPI(ethURL), callAPI(logsURL) ])
+      .then(res => {
+        const rates = { BTC: res[0], ETH: res[1] }
+        const data = res[2].reverse()
+        processLogs(data, rates)
+      })
       .catch(err => console.log('whoops: ', err))
-      .finally(callAPI(transactionsURL)
-        .then(data => processLogs(data.reverse())))
   }, [])
 
-  if(!data || !rates)
+  if(!data)
     return "Loading..."
 
   const total = data.pop().worthCAD
@@ -65,8 +67,8 @@ function App() {
       <div>
       Your total worth is {printCAD.format(total)}!
       </div>
-      <Chart logs={data} rate={rates} />
-      <ListLogs logs={data} rate={rates} />
+      <Chart data={data} setData={setData} />
+      <ListLogs data={data} setData={setData} />
     </div>
   );
 }

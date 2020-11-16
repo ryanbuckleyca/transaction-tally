@@ -3,7 +3,23 @@ import { Grid } from "gridjs-react";
 import {printCAD} from './scripts'
 import './style.css';
 
+// data={[
+//     ['John', 'john@example.com'],
+//     ['Mike', 'mike@gmail.com']
+//   ]}
+//   columns={['Name', 'Email']}
+//   search={true}
+//   pagination={{
+//     enabled: true,
+//     limit: 1,
+//   }}
+
 function ListLogs(props) {
+
+  if(!props) {
+    return "Loading..."
+  }
+  console.log('ListLogs loaded with props: ', props)
 
   const tooltip = (text, info, dir) => {
     const classDir = `tooltiptext tooltip tooltip${dir}`
@@ -24,11 +40,15 @@ function ListLogs(props) {
     }
     const date = (string) => {
       const d = new Date(string)
-      return d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+      return d.toLocaleString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      })
     }
     const time = (string) => {
       const t = new Date(string)
-      return t.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })
+      return t.toLocaleString('en-US', {
+        hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true
+      })
     }
     const conversionTooltip =
      `from ${tran.from && (tran.from.amount + ' ' + tran.from.currency)}
@@ -61,7 +81,7 @@ function ListLogs(props) {
         </tr>
       </thead>
       <tbody>
-        { props.logs.map(tran => row(tran)) }
+        { props.data.map(tran => row(tran)) }
       </tbody>
     </table>
   )

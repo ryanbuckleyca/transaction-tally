@@ -22,7 +22,7 @@ function Chart(props) {
   useEffect(()=>{
     const labels = []
     const data = []
-    props.logs.forEach((tran, i) => {
+    props.data.forEach((tran, i) => {
       labels.push(tran.createdAt.substr(0, 10))
       data.push(tran.worthCAD.toFixed(2))
     })
