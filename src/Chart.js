@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../node_modules/react-vis/dist/style.css';
-import {XYPlot, VerticalBarSeries, FlexibleWidthXYPlot} from 'react-vis';
+import {XYPlot, LineSeries, FlexibleWidthXYPlot} from 'react-vis';
 
 class Chart extends Component {
 
@@ -13,7 +13,7 @@ class Chart extends Component {
     return (
       <div className="App">
         <FlexibleWidthXYPlot height={300}>
-          <VerticalBarSeries data={data} />
+          <LineSeries curve={d3Shape.curveCatmullRom.alpha(0.5)} data={data} />
         </FlexibleWidthXYPlot>
       </div>
     );
