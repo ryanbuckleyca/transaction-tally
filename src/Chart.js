@@ -1,23 +1,42 @@
-import React, { Component } from 'react';
-import '../node_modules/react-vis/dist/style.css';
-import {XYPlot, LineSeries, FlexibleWidthXYPlot} from 'react-vis';
+import React, {useState, useEffect} from 'react';
+import {Line} from 'react-chartjs-2';
 
-class Chart extends Component {
+function Chart(props) {
 
-  render() {
+  const [chart, setChart] = useState({
+    data: {
+      labels: [],
+      datasets: [{
+          label: 'worth in CAD',
+          data: [],
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+      }]
+    },
+    options: {
+      maintainAspectRatio: false
+    }
+  })
 
-    const data = this.props.logs.map((tran, i) => {
-      return ({ x: i, y: tran.worthCAD })
+  useEffect(()=>{
+    const labels = []
+    const data = []
+    props.logs.forEach((tran, i) => {
+      labels.push(tran.createdAt.substr(0, 10))
+      data.push(tran.worthCAD.toFixed(2))
     })
+    chart.data.labels = labels
+    chart.data.datasets[0].data = data
+    setChart({...chart})
+  },[])
 
-    return (
-      <div className="App">
-        <FlexibleWidthXYPlot height={300}>
-          <LineSeries curve={d3Shape.curveCatmullRom.alpha(0.5)} data={data} />
-        </FlexibleWidthXYPlot>
-      </div>
-    );
-  }
+
+  return (
+    <div className="Chart">
+      <Line id="chart" data={chart.data} options={chart.options} />
+    </div>
+  );
 }
 
 export default Chart;
