@@ -11,7 +11,6 @@ function App() {
   const [data, setData] = useState();
 
   const processLogs = (logs, rates) => {
-    console.log('will process logs: ', logs)
     const balancedLogs = []
 
     for(let i = 0; i < logs.length; i++) {

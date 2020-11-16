@@ -29,5 +29,23 @@ const printCAD = new Intl.NumberFormat('en-CA', {
   currency: 'CAD',
 });
 
+const printDate = (string) => {
+  const d = new Date(string)
+  return d.toLocaleString('en-US', {
+    year: 'numeric', month: 'short', day: 'numeric'
+  })
+}
+const printTime = (string) => {
+  const t = new Date(string)
+  return t.toLocaleString('en-US', {
+    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true
+  })
+}
 
-export { ratesAtTime, printCAD, balanceCAD, convertToCAD };
+const dirColor = {
+  'credit': { color: 'green' },
+  'debit' : { color: 'red' }
+}
+
+
+export { ratesAtTime, printCAD, printDate, printTime, balanceCAD, convertToCAD, dirColor };

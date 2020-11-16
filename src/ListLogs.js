@@ -1,25 +1,13 @@
 import React from 'react';
-import { Grid } from "gridjs-react";
-import {printCAD} from './scripts'
+import { Grid, _ } from "gridjs-react";
+import {printCAD, printDate, printTime, dirColor} from './scripts'
 import './style.css';
-
-// data={[
-//     ['John', 'john@example.com'],
-//     ['Mike', 'mike@gmail.com']
-//   ]}
-//   columns={['Name', 'Email']}
-//   search={true}
-//   pagination={{
-//     enabled: true,
-//     limit: 1,
-//   }}
 
 function ListLogs(props) {
 
-  if(!props) {
+  if(!props.data) {
     return "Loading..."
   }
-  console.log('ListLogs loaded with props: ', props)
 
   const tooltip = (text, info, dir) => {
     const classDir = `tooltiptext tooltip tooltip${dir}`
@@ -34,56 +22,27 @@ function ListLogs(props) {
   }
 
   const row = (tran) => {
-    const dirColor = {
-      'credit': { color: 'green' },
-      'debit' : { color: 'red' }
-    }
-    const date = (string) => {
-      const d = new Date(string)
-      return d.toLocaleString('en-US', {
-        year: 'numeric', month: 'short', day: 'numeric'
-      })
-    }
-    const time = (string) => {
-      const t = new Date(string)
-      return t.toLocaleString('en-US', {
-        hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true
-      })
-    }
     const conversionTooltip =
      `from ${tran.from && (tran.from.amount + ' ' + tran.from.currency)}
       to ${tran.to && (tran.to.amount + ' ' + tran.to.currency)}`;
 
-    return(
-      <tr key={tran.createdAt}>
-        <td>{date(tran.createdAt)} {tooltip('time', time(tran.createdAt), 'right')}</td>
-        <td>{printCAD.format(tran.worthCAD)}</td>
-        <td style={dirColor[tran.direction]}>{tran.amount + ' ' + tran.currency}</td>
-        <td>
-        {
-          tran.direction
-          ? <div>{tran.direction} {tooltip('details', tran.type, 'left')}</div>
-          : <div>conversion {tooltip('details', conversionTooltip, 'left')}</div>
-        }
-        </td>
-      </tr>
-    )
+    const colDate = <span>{printDate(tran.createdAt)}  {tooltip('time', printTime(tran.createdAt), 'right')}</span>
+    const colWorth = printCAD.format(tran.worthCAD)
+    const colAmount = <span style={dirColor[tran.direction]}>{tran.amount + ' ' + tran.currency}</span>
+    const colInfo = tran.direction
+      ? <div>{tran.direction} {tooltip('details', tran.type, 'left')}</div>
+      : <div>conversion {tooltip('details', conversionTooltip, 'left')}</div>
+
+    return([ _(colDate), colWorth, _(colAmount), _(colInfo) ])
   }
 
   return(
-    <table style={{width: '100%'}}>
-      <thead>
-        <tr style={{background: '#ececec'}}>
-          <td>date</td>
-          <td>worth</td>
-          <td>amount</td>
-          <td>direction</td>
-        </tr>
-      </thead>
-      <tbody>
-        { props.data.map(tran => row(tran)) }
-      </tbody>
-    </table>
+    <Grid
+      data={props.data.map(tran => row(tran))}
+      columns={['date', 'worth', 'amount', 'details']}
+      search={false}
+      pagination={{enabled: true, limit: 20}}
+    />
   )
 }
 
