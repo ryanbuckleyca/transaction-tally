@@ -4,13 +4,11 @@ const ratesAtTime = (date, rates) => {
   const currencyRates = {}
   currencies.forEach(currency => {
     if (currency === 'CAD') return currencyRates.CAD = 1
-
     const dayRate = rates[currency]
       .filter(rate => rate.createdAt <= date)
       .pop()
     currencyRates[currency] = dayRate ? dayRate.midMarketRate : null
   })
-
   return currencyRates
 }
 

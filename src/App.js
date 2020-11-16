@@ -46,7 +46,6 @@ function App() {
 
     const balances = getBalance(currency, direction)
     const dayRates = ratesAtTime(createdAt, rates)
-    console.log("dayRates", dayRates)
     const amountCAD = convertToCAD(amount, direction, currency, dayRates)
     const worthCAD = balanceCAD(dayRates, balances)
 
