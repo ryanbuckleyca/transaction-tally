@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatter} from './scripts'
+import {printCAD} from './scripts'
 import './style.css';
 
 function ListLogs(props) {
@@ -24,7 +24,7 @@ function ListLogs(props) {
     return(
       <tr key={tran.createdAt}>
         <td>{tran.createdAt}</td>
-        <td>{formatter.format(tran.worthCAD)}</td>
+        <td>{printCAD.format(tran.worthCAD)}</td>
         <td>{tran.currency}</td>
         <td>{tran.type}</td>
         <td style={dirColor[tran.direction]}>{tran.amount + ' ' + tran.currency}</td>

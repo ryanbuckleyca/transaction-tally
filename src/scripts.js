@@ -1,16 +1,17 @@
+const currencies = ['ETH', 'BTC', 'CAD']
+
 const ratesAtTime = (date, rates) => {
-  const ethRates = rates.ETH.filter(
-    rate => rate.createdAt <= date
-  )
-  const btcRates = rates.BTC.filter(
-    rate => rate.createdAt <= date
-  )
-  const dayRates = {
-    ETH: ethRates[ethRates.length-1] ? ethRates[ethRates.length-1].midMarketRate : null,
-    BTC: btcRates[btcRates.length-1] ? btcRates[btcRates.length-1].midMarketRate : null,
-    CAD: 1
-  }
-  return dayRates
+  const currencyRates = {}
+  currencies.forEach(currency => {
+    if (currency === 'CAD') return currencyRates.CAD = 1
+
+    const dayRate = rates[currency]
+      .filter(rate => rate.createdAt <= date)
+      .pop()
+    currencyRates[currency] = dayRate ? dayRate.midMarketRate : null
+  })
+
+  return currencyRates
 }
 
 const convertToCAD = (amount, direction, currency, rates) => {
@@ -20,16 +21,15 @@ const convertToCAD = (amount, direction, currency, rates) => {
 }
 
 const balanceCAD = (rates, balances) => {
-  const fromETH = balances.ETH >= 0 ? balances.ETH * rates.ETH : 0
-  const fromBTC = balances.BTC >= 0 ? balances.BTC * rates.BTC : 0
-  const fromCAD = balances.CAD >= 0 ? balances.CAD : 0
-  return fromETH + fromBTC + fromCAD
+  return currencies
+    .map(i => (balances[i] >= 0) ? (balances[i] * rates[i]) : 0)
+    .reduce((a, b) => a + b, 0)
 }
 
-const formatter = new Intl.NumberFormat('en-CA', {
+const printCAD = new Intl.NumberFormat('en-CA', {
   style: 'currency',
   currency: 'CAD',
 });
 
 
-export { ratesAtTime, formatter, balanceCAD, convertToCAD };
+export { ratesAtTime, printCAD, balanceCAD, convertToCAD };

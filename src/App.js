@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import ListLogs from './ListLogs'
 import Chart from './Chart'
-import { ratesAtTime, formatter, balanceCAD, convertToCAD } from './scripts'
+import { ratesAtTime, printCAD, balanceCAD, convertToCAD } from './scripts'
 
 const transactionsURL = 'https://shakepay.github.io/programming-exercise/web/transaction_history.json'
 const btcURL = 'https://shakepay.github.io/programming-exercise/web/rates_CAD_BTC.json'
@@ -31,7 +31,6 @@ function App() {
   for(let i = 0; i < logs.length; i++) {
     const { createdAt, amount, direction, currency, to, from } = logs[i]
     const prevBalances = i > 0 && balancedLogs[i-1].balances
-
     const addBal = (curr, amt, dir) => (prevBalances[curr] || 0) + amt * dir
 
     const getBalance = (curr, dir) => {
@@ -47,6 +46,7 @@ function App() {
 
     const balances = getBalance(currency, direction)
     const dayRates = ratesAtTime(createdAt, rates)
+    console.log("dayRates", dayRates)
     const amountCAD = convertToCAD(amount, direction, currency, dayRates)
     const worthCAD = balanceCAD(dayRates, balances)
 
@@ -61,7 +61,7 @@ function App() {
       Wealth Tracker:
       </h1>
       <div>
-      Your total worth is {formatter.format(total)}!
+      Your total worth is {printCAD.format(total)}!
       </div>
       <Chart logs={balancedLogs} />
       <ListLogs logs={balancedLogs} />
