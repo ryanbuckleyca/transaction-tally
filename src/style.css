@@ -5,6 +5,10 @@ body {
 .App {
   text-align: center;
 }
+.Chart {
+  width: 100px;
+  height: 50px;
+}
 .rv-xy-plot {
   width: 100%;
   margin: auto;
