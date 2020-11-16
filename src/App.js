@@ -58,13 +58,13 @@ function App() {
   return (
     <div className="App">
       <h1>
-      log Tallier:
+      Wealth Tracker:
       </h1>
       <div>
       Your total worth is {formatter.format(total)}!
       </div>
       <Chart logs={balancedLogs} />
-      <ListLogs logs={logs} />
+      <ListLogs logs={balancedLogs} />
     </div>
   );
 }

@@ -1,17 +1,34 @@
 import React from 'react';
+import {formatter} from './scripts'
+import './style.css';
 
 function ListLogs(props) {
 
   const row = (tran) => {
+    const tooltip =
+      <div>conversion (
+        <span className="tooltip">
+          details
+          <span className="tooltiptext">
+          from: {tran.from && (tran.from.amount + ' ' + tran.from.currency)}<br />
+          to: {tran.to && (tran.to.amount + ' ' + tran.to.currency)}
+          </span>
+        </span>)
+      </div>
+
+    const dirColor = {
+      'credit': { color: 'green' },
+      'debit' : { color: 'red' }
+    }
+
     return(
       <tr key={tran.createdAt}>
         <td>{tran.createdAt}</td>
-        <td>{tran.amount}</td>
+        <td>{formatter.format(tran.worthCAD)}</td>
         <td>{tran.currency}</td>
         <td>{tran.type}</td>
-        <td>{tran.direction}</td>
-        <td>{tran.from && (tran.from.amount + ' ' + tran.from.currency)}</td>
-        <td>{tran.to && (tran.to.amount + ' ' + tran.to.currency)}</td>
+        <td style={dirColor[tran.direction]}>{tran.amount + ' ' + tran.currency}</td>
+        <td>{tran.direction || tooltip}</td>
       </tr>
     )
   }
@@ -20,13 +37,12 @@ function ListLogs(props) {
     <table style={{width: '100%'}}>
       <thead>
         <tr style={{background: '#ececec'}}>
-          <td>createdAt</td>
-          <td>amount</td>
+          <td>date</td>
+          <td>worth</td>
           <td>currency</td>
           <td>type</td>
+          <td>amount</td>
           <td>direction</td>
-          <td>from: </td>
-          <td>to: </td>
         </tr>
       </thead>
       <tbody>
