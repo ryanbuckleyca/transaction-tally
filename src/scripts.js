@@ -1,29 +1,30 @@
-const rateAtTime = (transaction, rates) => {
-  const date = (obj) => new Date(obj.createdAt)
-  const currency = transaction.currency
-  const findRates = rates[currency].filter(
-    rate => date(rate) <= date(transaction)
+const ratesAtTime = (date, rates) => {
+  const ethRates = rates.ETH.filter(
+    rate => rate.createdAt <= date
   )
-  const prevRates = findRates.sort(
-    (a, b) => date(b) - date(a)
+  const btcRates = rates.BTC.filter(
+    rate => rate.createdAt <= date
   )
-  return prevRates[0].midMarketRate
+  const dayRates = {
+    ETH: ethRates[ethRates.length-1] ? ethRates[ethRates.length-1].midMarketRate : null,
+    BTC: btcRates[btcRates.length-1] ? btcRates[btcRates.length-1].midMarketRate : null,
+    CAD: 1
+  }
+  return dayRates
 }
 
-const amountsCAD = (transactions, rates) => {
-  return transactions.map(t => {
-    const x = t.direction === 'debit' ? -1 : 1
-    const amtCADatTime = t.currency === 'CAD' ? 1 : rateAtTime(t, rates)
-    return t.amount * amtCADatTime * x
-  })
+const convertToCAD = (amount, direction, currency, rates) => {
+  if(!direction)
+    return null
+  return amount * rates[currency] * (direction === 'credit' ? 1 : -1)
 }
 
-const omitConvertions = (logs) => {
-  const trans = ['credit', 'debit']
-  return logs.filter(log => trans.includes(log.direction))
+const balanceCAD = (rates, balances) => {
+  const fromETH = balances.ETH >= 0 ? balances.ETH * rates.ETH : 0
+  const fromBTC = balances.BTC >= 0 ? balances.BTC * rates.BTC : 0
+  const fromCAD = balances.CAD >= 0 ? balances.CAD : 0
+  return fromETH + fromBTC + fromCAD
 }
-
-const sumAmts = (amts) => amts.reduce((a,b) => a+b, 0);
 
 const formatter = new Intl.NumberFormat('en-CA', {
   style: 'currency',
@@ -31,4 +32,4 @@ const formatter = new Intl.NumberFormat('en-CA', {
 });
 
 
-export { amountsCAD, omitConvertions, sumAmts, formatter };
+export { ratesAtTime, formatter, balanceCAD, convertToCAD };
